@@ -61,7 +61,26 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	
+	double radiansPerSubdivision = (2 * 3.14) / a_nSubdivisions;
+	std::vector<vector3> points;
+	std::cout << "Radians : " << radiansPerSubdivision << std::endl;
+
+	//create the points 
+	for (uint i = 0; i < a_nSubdivisions; i++)
+	{
+		vector3 vertex = vector3(cos(radiansPerSubdivision * i) * a_fRadius, sin(radiansPerSubdivision * i) * a_fRadius, -a_fHeight/2);
+		points.push_back(vertex);
+	}
+	//create the triangles
+	for (uint i = 0; i < a_nSubdivisions; i++)
+	{
+		//BASE
+		AddTri(vector3(0.0, 0.0, -a_fHeight/2), points[i], points[(i + 1) % a_nSubdivisions]);
+		//POINTY PART
+		AddTri(points[(i + 1) % a_nSubdivisions], points[i], vector3(0.0, 0.0, a_fHeight/2));
+	}
+
 	// -------------------------------
 
 	// Adding information about color
@@ -85,7 +104,30 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+
+	double radiansPerSubdivision = (2 * 3.14) / a_nSubdivisions;
+	std::vector<vector3> points;
+	std::cout << "Radians : " << radiansPerSubdivision << std::endl;
+
+	//BASE
+	//create the points 
+	for (uint i = 0; i < a_nSubdivisions; i++)
+	{
+		vector3 vertex = vector3(cos(radiansPerSubdivision * i) * a_fRadius, sin(radiansPerSubdivision * i) * a_fRadius, -a_fHeight/2);
+		points.push_back(vertex);
+	}
+	//create the triangles
+	for (uint i = 0; i < a_nSubdivisions; i++)
+	{
+		//base 1
+		AddTri(points[(i + 1) % a_nSubdivisions], points[i],vector3(0.0, 0.0, -a_fHeight / 2));
+		//base 2
+		vector3 base2Y = points[i] + vector3(0.0, 0.0, a_fHeight);
+		vector3 base2Z = points[(i + 1) % a_nSubdivisions] + vector3(0.0, 0.0, a_fHeight);
+		AddTri(vector3(0.0, 0.0, a_fHeight/2), base2Y, base2Z);
+		//sides
+		AddQuad(base2Z, base2Y, points[(i + 1) % a_nSubdivisions], points[i]);
+	}
 	// -------------------------------
 
 	// Adding information about color
@@ -115,7 +157,37 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
+	double radiansPerSubdivision = (2 * 3.14) / a_nSubdivisions;
+	std::vector<vector3> points;
+	std::vector<vector3> points2;
+	std::cout << "Radians : " << radiansPerSubdivision << std::endl;
+	//BASE
+	//create the points 
+	for (uint i = 0; i < a_nSubdivisions; i++)
+	{
+		//inner point
+		vector3 vertex = vector3(cos(radiansPerSubdivision * i) * a_fInnerRadius, sin(radiansPerSubdivision * i) * a_fInnerRadius, -a_fHeight / 2);
+		points.push_back(vertex);
+		//outer point
+		vertex = vector3(cos(radiansPerSubdivision * i) * a_fOuterRadius, sin(radiansPerSubdivision * i) * a_fOuterRadius, -a_fHeight / 2);
+		points2.push_back(vertex);
+	}
+	//create the triangles
+	for (uint i = 0; i < a_nSubdivisions; i++)
+	{
+		//base 1
+		AddQuad(points2[(i + 1) % a_nSubdivisions], points2[i], points[(i + 1) % a_nSubdivisions], points[i]);
+		//base 2
+		vector3 base2Y = points[i] + vector3(0.0, 0.0, a_fHeight);
+		vector3 base2Z = points[(i + 1) % a_nSubdivisions] + vector3(0.0, 0.0, a_fHeight);
+		vector3 base2Y2 = points2[i] + vector3(0.0, 0.0, a_fHeight);
+		vector3 base2Z2 = points2[(i + 1) % a_nSubdivisions] + vector3(0.0, 0.0, a_fHeight);
+		AddQuad(base2Z, base2Y, base2Z2, base2Y2);
+
+		//sides
+		AddQuad(points[(i + 1) % a_nSubdivisions], points[i], base2Z, base2Y);
+		AddQuad(base2Z2, base2Y2, points2[(i + 1) % a_nSubdivisions], points2[i]);
+	}
 	// -------------------------------
 
 	// Adding information about color
@@ -147,7 +219,57 @@ void MyMesh::GenerateTorus(float a_fOuterRadius, float a_fInnerRadius, int a_nSu
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
+	//GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
+
+	//make inner circles
+	double radiansPerSubdivisionA = (2 * 3.14) / a_nSubdivisionsA;
+	double radiansPerSubdivisionB = (2 * 3.14) / a_nSubdivisionsB;
+	double radiusModifier = (a_fOuterRadius - a_fInnerRadius);
+	std::vector<vector3> points;
+
+	for (uint i = 0; i < a_nSubdivisionsA; i++)
+	{
+		double xPos = (cos(radiansPerSubdivisionA * i) * radiusModifier);
+		double yPos = (sin(radiansPerSubdivisionA * i) * radiusModifier);
+		vector3 vertex = vector3(xPos, yPos, 0.0f);
+		points.push_back(vertex);
+	}
+	float fRadiusTorus = a_fOuterRadius+a_fInnerRadius;
+	std::vector<std::vector<vector3>> quadPoints;
+	for (uint x = 0; x < a_nSubdivisionsB; x++)
+	{
+		//rotate the circles
+		matrix4 m4Transform = IDENTITY_M4;
+		m4Transform = glm::rotate(m4Transform, (float)radiansPerSubdivisionB * x, vector3(0.0f, 1.0f, 0.0f));
+		m4Transform = glm::translate(m4Transform, vector3(fRadiusTorus, 0.0f, 0.0f));
+		std::vector<vector3> pointsCopy;
+		pointsCopy = points;
+		std::vector<vector3> quadPoints1;
+		for (uint i = 0; i < a_nSubdivisionsA; i++)
+		{
+			pointsCopy[i] = m4Transform * vector4(pointsCopy[i], 1.0f);
+			quadPoints1.push_back(pointsCopy[i]);
+			/*double xPos = (cos(radiansPerSubdivisionA * i) * radiusModifier + a_fInnerRadius);
+			double yPos = (sin(radiansPerSubdivisionA * i) * radiusModifier);
+			vector3 vertex = vector3(xPos, yPos, 0.0f);
+			points.push_back(vertex);*/
+		}
+		quadPoints.push_back(quadPoints1);
+		/*vector3 v3center = ZERO_V3;
+		v3center = m4Transform * vector4(v3center, 1.0f);
+		for (uint i = 0; i < a_nSubdivisionsA; i++)
+		{
+			AddTri(pointsCopy[(i + 1) % a_nSubdivisionsA], pointsCopy[i], v3center);
+		}*/
+	}
+	//iterate through points to make quads.
+	for (uint x = 0; x < quadPoints.size(); x++)
+	{
+		for (uint i = 0; i < quadPoints[x].size(); i++) 
+		{
+		    AddQuad(quadPoints[(x + 1) % a_nSubdivisionsB][i], quadPoints[(x + 1) % a_nSubdivisionsB][(i + 1) % a_nSubdivisionsA], quadPoints[x][i], quadPoints[x][(i + 1) % a_nSubdivisionsA]);
+		}
+	}
 	// -------------------------------
 
 	// Adding information about color
@@ -172,7 +294,53 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+	//GenerateCube(a_fRadius * 2.0f, a_v3Color);
+
+	//create circle to base points off of
+	double radiansPerSubdivision = (2 * 3.14) / (a_nSubdivisions*2);
+	std::vector<vector3> points;
+
+	for (uint i = 0; i < a_nSubdivisions*2; i++)
+	{
+		double xPos = (cos(radiansPerSubdivision * i) * a_fRadius);
+		double yPos = (sin(radiansPerSubdivision * i) * a_fRadius);
+		vector3 vertex = vector3(xPos, yPos, 0.0f);
+		points.push_back(vertex);
+	}
+	std::vector<std::vector<vector3>> quadPoints;
+	for (uint x = 0; x < a_nSubdivisions*2; x++)
+	{
+		//rotate the circle around to each subdivision
+		matrix4 m4Transform = IDENTITY_M4;
+		m4Transform = glm::rotate(m4Transform, (float)radiansPerSubdivision * x, vector3(0.0f, 1.0f, 0.0f));
+		m4Transform = glm::translate(m4Transform, vector3(0.0f, 0.0f, 0.0f));
+		std::vector<vector3> pointsCopy;
+		pointsCopy = points;
+		std::vector<vector3> quadPoints1;
+		//make a list of those points
+		for (uint i = 0; i < a_nSubdivisions*2; i++)
+		{
+			pointsCopy[i] = m4Transform * vector4(pointsCopy[i], 1.0f);
+			quadPoints1.push_back(pointsCopy[i]);
+		}
+		quadPoints.push_back(quadPoints1);
+		vector3 v3center = ZERO_V3;
+		v3center = m4Transform * vector4(v3center, 1.0f);
+		/*for (uint i = 0; i < a_nSubdivisions*2; i++)
+		{
+			AddTri(pointsCopy[(i + 1) % a_nSubdivisions], pointsCopy[i], v3center);
+		}*/
+	}
+
+	//iterate through the points on the circles and made quads
+	for (uint x = 0; x < quadPoints.size(); x++)
+	{
+		for (uint i = 0; i < quadPoints[x].size(); i++)
+		{
+			AddQuad(quadPoints[(x + 1) %(a_nSubdivisions*2)][i], quadPoints[(x + 1) % (a_nSubdivisions * 2)][(i + 1) % (a_nSubdivisions * 2)], quadPoints[x][i], quadPoints[x][(i + 1) % (a_nSubdivisions * 2)]);
+		}
+	}
+
 	// -------------------------------
 
 	// Adding information about color
