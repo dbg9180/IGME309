@@ -11,6 +11,7 @@ void Application::InitVariables(void)
 	//Allocate the memory for the Meshes
 	m_pMesh = new MyMesh();
 	m_pMesh->GenerateCube(1.0f, C_BLACK);
+
 		
 }
 void Application::Update(void)
@@ -38,9 +39,31 @@ void Application::Display(void)
 	//Calculate the model, view and projection matrix
 	matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix();
 	matrix4 m4View = m_pCameraMngr->GetViewMatrix();
-
-	m_pMesh->Render(m4Projection, m4View, ToMatrix4(m_qArcBall));
-
+	
+	static float disp = 0.0f;
+	std::vector<std::vector<bool>> creature = { {0,0,0,1,1,0,1,1,0,0,0},
+												{1,0,1,0,0,0,0,0,1,0,1},
+												{1,0,1,1,1,1,1,1,1,0,1},
+												{1,1,1,1,1,1,1,1,1,1,1},
+												{0,1,1,0,1,1,1,0,1,1,0},
+												{0,0,1,1,1,1,1,1,1,0,0},
+												{0,0,0,1,0,0,0,1,0,0,0},
+												{0,0,1,0,0,0,0,0,1,0,0}
+												 };
+	matrix4 m4Model = glm::translate(IDENTITY_M4, vector3(disp, 0.0f, 0.0f));
+	
+	//m_pMesh->Render(m4Projection, m4View, m4Model);
+	for (int i = 0; i < creature.size(); i++)
+	{
+		for (int j = 0; j < creature[i].size(); j++)
+		{
+			if (creature[i][j] == true)
+			{
+				m_pMesh->Render(m4Projection, m4View, glm::translate(m4Model, vector3((float)j, (float)i, 0.0f)));
+			}
+		}
+	}
+	disp += 0.02f;
 	// draw a skybox
 	m_pModelMngr->AddSkyboxToRenderList();
 
