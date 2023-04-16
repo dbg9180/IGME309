@@ -109,7 +109,7 @@ void MyRigidBody::SetModelMatrix(matrix4 a_m4ModelMatrix)
 	m_v3MaxG = m_v3MinG = v3Corner[0];
 
 	//get the new max and min for the global box
-	for (uint i = 1; i < 8; ++i)
+	for (int i = 1; i < 8; ++i)
 	{
 		if (m_v3MaxG.x < v3Corner[i].x) m_v3MaxG.x = v3Corner[i].x;
 		else if (m_v3MinG.x > v3Corner[i].x) m_v3MinG.x = v3Corner[i].x;
