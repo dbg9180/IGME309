@@ -52,11 +52,13 @@ void Application::ProcessKeyReleased(sf::Event a_event)
 	case sf::Keyboard::P:
 		TextureManager::SaveScreenshot(m_pSystem->GetAppName());
 		break;
+	case sf::Keyboard::J:
 	case sf::Keyboard::PageUp:
 		++m_uOctantID;
 		if (m_uOctantID >= m_pRoot->GetOctantCount())
 			m_uOctantID = -1;
 		break;
+	case sf::Keyboard::K:
 	case sf::Keyboard::PageDown:
 		--m_uOctantID;
 		if (m_uOctantID >= m_pRoot->GetOctantCount())

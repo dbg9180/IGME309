@@ -16,6 +16,7 @@ Update: 2021/02
 
 #include "Octant.h"
 
+
 using namespace BTX;
 
 class Application
